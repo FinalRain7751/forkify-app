@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Get access to hundreds of recipes",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,5 +12,9 @@
   "license": "ISC",
   "devDependencies": {
     "parcel": "^2.10.2"
+  },
+  "dependencies": {
+    "core-js": "^3.33.2",
+    "regenerator-runtime": "^0.14.0"
   }
 }
