@@ -16,12 +16,9 @@ export default async function displayRecipe(event) {
   spinner.classList.remove("hidden");
   recipeDiv.innerHTML = "";
 
-  console.log(event.target);
-  const recipeId = event.target.dataset.id;
+  const recipeId = event.target.closest(".recipe-list--item").dataset.id;
 
   const recipe = await getRecipeById(BASE_URL, recipeId);
-
-  // console.log(recipe);
 
   const ingLength = recipe.ingredients.length;
 

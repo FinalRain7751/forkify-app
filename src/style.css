@@ -89,6 +89,7 @@ body {
 
 .hidden {
   display: none;
+  opacity: 0;
 }
 
 .nav {
@@ -418,6 +419,8 @@ aside {
   font-size: var(--fs-500);
   font-weight: var(--fw-600);
   text-transform: uppercase;
+
+  width: 25ch;
 }
 .recipe-list--item p {
   font-size: var(--fs-400);
@@ -426,9 +429,7 @@ aside {
 }
 
 .pagination-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 6rem;
   margin-inline: 2rem;
 }
 
