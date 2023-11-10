@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forkify App</title>
-    <script defer type="module" src="src/js/index.js"></script>
+    <script defer type="module" src="src/js/controller.js"></script>
     <link rel="stylesheet" href="src/style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap"
@@ -65,19 +65,7 @@
             </p>
           </footer>
         </aside>
-        <article class="recipe" id="recipe">
-          <div class="no-recipe-selected flex-center">
-            <svg class="nav-icon">
-              <use href="src/images/icons.svg#icon-smile"></use>
-            </svg>
-            <p>Start by searching for a recipe or an ingredient. Have fun!</p>
-          </div>
-          <div class="flex-center spinner hidden">
-            <svg>
-              <use href="src/images/icons.svg#icon-loader"></use>
-            </svg>
-          </div>
-        </article>
+        <article class="recipe" id="recipe"></article>
       </main>
     </div>
   </body>
