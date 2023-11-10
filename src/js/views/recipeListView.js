@@ -10,7 +10,7 @@ class RecipeListView extends View {
     return `${this._data
       .map((recipe) => {
         return `
-        <li data-id=${recipe.id} class="recipe-list--item">
+        <li class="recipe-list--item">
             <a href="#${recipe.id}">
                 <img src="${recipe.image}" alt="small recipe image" />
                 <div>

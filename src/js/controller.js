@@ -5,6 +5,8 @@ import "regenerator-runtime/runtime";
 
 import {
   getSearchResultsPerPage,
+  loadBookmarks,
+  updateBookmarks,
   loadRecipe,
   loadRecipesList,
   state,
@@ -13,6 +15,7 @@ import recipeView from "./views/recipeView";
 import searchView from "./views/searchView";
 import recipeListView from "./views/recipeListView";
 import paginationBtnView from "./views/paginationBtnView";
+import bookmarkView from "./views/bookmarkView";
 
 if (module.hot) {
   module.hot.accept();
@@ -51,12 +54,6 @@ export const controlSearchResults = async () => {
 export const controlPagination = () => {
   state.search.page = paginationBtnView.getTargetPage();
 
-  // if (event === "next") {
-  //   state.search.page += 1;
-  // } else {
-  //   state.search.page -= 1;
-  // }
-
   recipeListView.render(getSearchResultsPerPage());
   paginationBtnView.render({
     lastPage: state.search.lastPage,
@@ -64,9 +61,27 @@ export const controlPagination = () => {
   });
 };
 
+export const controlBookmarks = () => {
+  const bookmarkedRecipes = state.bookmarks.recipes;
+  if (bookmarkedRecipes.length === 0) return;
+
+  bookmarkView.render(bookmarkedRecipes);
+};
+
+export const controlBookmarkStatus = () => {
+  const recipeId = recipeView.getRecipeId();
+
+  return state.bookmarks.recipeIds.find((id) => id === recipeId) ? true : false;
+};
+
 const init = () => {
   searchView.searchBarAnimation();
-  recipeView.addHandlerRender(controlRecipes);
+  bookmarkView.addHandlerBookmarks(loadBookmarks, controlBookmarks);
+  recipeView.addHandlerRender(
+    controlRecipes,
+    controlBookmarkStatus,
+    updateBookmarks
+  );
   searchView.addHandlerSearch(controlSearchResults);
   paginationBtnView.addHandlerPagination(controlPagination);
 };

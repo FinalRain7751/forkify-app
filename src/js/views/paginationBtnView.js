@@ -33,8 +33,6 @@ class PaginationBtnView extends View {
       </button>
       `;
 
-    console.log(currentPage, lastPage);
-
     if (currentPage === 1 && lastPage !== 1) {
       markup = btnNextHtml;
     } else if (currentPage === lastPage && lastPage !== 1) {
@@ -54,17 +52,13 @@ class PaginationBtnView extends View {
     this._parentElement.addEventListener("click", (event) => {
       event.preventDefault();
 
-      //   if (event.target.closest("#paginate-next")) {
-      //     this._event = "next";
-      //   } else if (event.target.closest("#paginate-prev")) {
-      //     this._event = "prev";
-      //   }
-
-      console.log(event.target.closest(".btn--paginate").dataset.toPage);
-
-      this._targetPage = Number(
-        event.target.closest(".btn--paginate").dataset.toPage
+      const gotoPage = Number(
+        event.target.closest(".btn--paginate")?.dataset.toPage
       );
+
+      if (!gotoPage) return;
+
+      this._targetPage = gotoPage;
 
       handler();
     });

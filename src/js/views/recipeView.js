@@ -7,26 +7,50 @@ class RecipeView extends View {
   _errorMsg = "We could not find that recipe. Please try another one!";
   _message = "";
   _recipeId = "";
+  _isBookmarked;
 
   getRecipeId() {
     return this._recipeId;
   }
 
-  addHandlerRender(handler) {
+  addHandlerRender(handler, getBookmarkStatus, updateBookmarks) {
     ["hashchange", "load"].forEach((event) => {
       window.addEventListener(event, async (e) => {
         e.preventDefault();
+
         this.renderMessage(
           "Start by searching for a recipe or an ingredient. Have fun!"
         );
-        const recipeId = window.location.hash.slice(1);
 
+        const recipeId = window.location.hash.slice(1);
         if (!recipeId) return;
 
         this._recipeId = recipeId;
 
+        this._isBookmarked = getBookmarkStatus();
         await handler();
+
+        // if (event === "hashchange") {
+        // }
       });
+    });
+
+    this._parentElement.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      if (!event.target.closest(".recipe--info-bookmark")) return;
+
+      let action;
+
+      if (this._isBookmarked) {
+        action = "remove";
+      } else {
+        action = "add";
+      }
+
+      this._isBookmarked = !this._isBookmarked;
+      await updateBookmarks(action);
+      this.render(this._data);
     });
   }
 
@@ -63,7 +87,9 @@ class RecipeView extends View {
       </div>
       <div class="recipe--info-bookmark">
         <svg class="nav-icon">
-          <use href="${icons}#icon-bookmark-fill"></use>
+          <use href="${icons}#icon-bookmark${
+      this._isBookmarked ? "" : "-fill"
+    }"></use>
         </svg>
       </div>
     </section>
@@ -75,13 +101,13 @@ class RecipeView extends View {
         <svg class="nav-icon">
           <use href="${icons}#icon-check"></use>
         </svg>
-        <p>${
+        <div>${
           (ingredient.quantity ?? "") +
           " " +
           (ingredient.unit ?? "") +
           " " +
           ingredient.description
-        }</p>
+        }</div>
       </li>`;
           })
           .join("")}
