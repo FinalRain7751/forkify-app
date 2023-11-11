@@ -8,8 +8,20 @@ class BookmarkView extends View {
   addHandlerBookmarks(handler) {
     window.addEventListener("load", async (event) => {
       event.preventDefault();
+
+      this.renderMessage("No bookmarked recipes!");
+
       await handler();
     });
+  }
+
+  render(data) {
+    if (!data) return this.renderError();
+
+    this._data = data;
+    const markup = this._generateMarkup();
+    this._clear();
+    this._parentElement.insertAdjacentHTML("afterbegin", markup);
   }
 
   _generateMarkup() {

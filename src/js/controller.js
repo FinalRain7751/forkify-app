@@ -10,6 +10,7 @@ import {
   loadRecipe,
   loadRecipesList,
   state,
+  updateServings,
 } from "./model";
 import recipeView from "./views/recipeView";
 import searchView from "./views/searchView";
@@ -61,49 +62,69 @@ export const controlPagination = () => {
   });
 };
 
-export const controlBookmarks = async (action = "") => {
-  if (action) {
-    updateBookmarks(action);
-    recipeView.render(state.recipe);
+export const controlBookmarks = async () => {
+  try {
+    await loadBookmarks();
+    const bookmarkedRecipes = state.bookmarks.recipes;
+    if (bookmarkedRecipes.length === 0) return;
+
+    bookmarkView.render(bookmarkedRecipes);
+  } catch (err) {
+    console.log(`${err} 🌋🌋🌋`);
+    bookmarkView.renderError();
+  }
+};
+
+export const controlUpdateBookmarks = (action) => {
+  const currBookmarksIds = state.bookmarks.recipeIds;
+  const currBookmarks = state.bookmarks.recipes;
+
+  let newBookmarksIds = [...currBookmarksIds];
+  let newBookmarks = [...currBookmarks];
+
+  const recipeId = state.recipe.id;
+  if (action === "add") {
+    newBookmarksIds.push(recipeId);
+    newBookmarks.push(state.recipe);
+  } else {
+    newBookmarksIds = currBookmarksIds.filter((id) => id !== recipeId);
+    newBookmarks = currBookmarks.filter((bm) => bm.id !== recipeId);
   }
 
-  await loadBookmarks();
-  const bookmarkedRecipes = state.bookmarks.recipes;
-  if (bookmarkedRecipes.length === 0) return;
+  updateBookmarks(newBookmarksIds, newBookmarks);
+  recipeView.update(state.recipe);
 
-  bookmarkView.render(bookmarkedRecipes);
+  // if (newBookmarks.length === 0) {
+  //   bookmarkView._clear;
+  // }
+
+  // bookmarkView.render(state.bookmarks.recipes);
+  bookmarkView.render(state.bookmarks.recipes);
 };
 
 export const controlServings = (action) => {
   const currServings = state.recipe.servings;
-  const currIngredients = state.recipe.ingredients;
 
+  let newServings;
   if (action === "increase") {
-    state.recipe.servings = currServings + 1;
+    newServings = currServings + 1;
   } else {
     if (currServings === 1) return;
-    state.recipe.servings -= 1;
+    newServings = currServings - 1;
   }
 
-  state.recipe.ingredients = currIngredients.map((ing) => {
-    const quantity = (ing.quantity / currServings) * state.recipe.servings;
-    return {
-      ...ing,
-      quantity: quantity === 0 ? null : quantity,
-    };
-  });
+  updateServings(newServings);
 
-  recipeView.render(state.recipe);
+  // recipeView.render(state.recipe);
+  recipeView.update(state.recipe);
 };
 
 const init = () => {
   searchView.searchBarAnimation();
   bookmarkView.addHandlerBookmarks(controlBookmarks);
-  recipeView.addHandlerRender(
-    controlRecipes,
-    controlServings,
-    controlBookmarks
-  );
+  recipeView.addHandlerRender(controlRecipes);
+  recipeView.addHandlerUpdateServings(controlServings);
+  recipeView.addHandlerUpdateBookmarks(controlUpdateBookmarks);
   searchView.addHandlerSearch(controlSearchResults);
   paginationBtnView.addHandlerPagination(controlPagination);
 };

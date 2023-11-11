@@ -110,17 +110,24 @@ export const loadBookmarks = async () => {
   }
 };
 
-export const updateBookmarks = (action) => {
-  const recipeId = state.recipe.id;
-  if (action === "add") {
-    state.bookmarks.recipeIds.push(recipeId);
-  } else {
-    state.bookmarks.recipeIds = state.bookmarks.recipeIds.filter(
-      (id) => id !== recipeId
-    );
-  }
-
+export const updateBookmarks = (newBookmarksIds, newBookmarks) => {
   state.recipe.isBookmarked = !state.recipe.isBookmarked;
+  state.bookmarks.recipeIds = newBookmarksIds;
+  state.bookmarks.recipes = newBookmarks;
 
-  localStorage.setItem("bookmarks", JSON.stringify(state.bookmarks.recipeIds));
+  localStorage.setItem("bookmarks", JSON.stringify(newBookmarksIds));
+};
+
+export const updateServings = (newServings) => {
+  const currIngredients = state.recipe.ingredients;
+  const currServings = state.recipe.servings;
+
+  state.recipe.servings = newServings;
+  state.recipe.ingredients = currIngredients.map((ing) => {
+    const quantity = (ing.quantity / currServings) * newServings;
+    return {
+      ...ing,
+      quantity: quantity === 0 ? null : quantity,
+    };
+  });
 };

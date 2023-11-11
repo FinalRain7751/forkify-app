@@ -7,7 +7,7 @@ class RecipeView extends View {
   _errorMsg = "We could not find that recipe. Please try another one!";
   _message = "";
 
-  addHandlerRender(handler, updateServingsHandler, updateBookmarksHandler) {
+  addHandlerRender(handler) {
     ["hashchange", "load"].forEach((event) => {
       window.addEventListener(event, async (e) => {
         e.preventDefault();
@@ -22,8 +22,12 @@ class RecipeView extends View {
         await handler(recipeId);
       });
     });
+  }
 
-    this._parentElement.addEventListener("click", async (event) => {
+  addHandlerUpdateBookmarks(handler) {
+    this._parentElement.addEventListener("click", (event) => {
+      event.preventDefault();
+
       if (event.target.closest(".recipe--info-bookmark")) {
         let action;
         if (this._data.isBookmarked) {
@@ -31,15 +35,21 @@ class RecipeView extends View {
         } else {
           action = "add";
         }
-        updateBookmarksHandler(action);
+        handler(action);
       }
+    });
+  }
+
+  addHandlerUpdateServings(handler) {
+    this._parentElement.addEventListener("click", (event) => {
+      event.preventDefault();
 
       if (event.target.closest("#increase-servings")) {
-        updateServingsHandler("increase");
+        handler("increase");
       }
 
       if (event.target.closest("#decrease-servings")) {
-        updateServingsHandler("decrease");
+        handler("decrease");
       }
     });
   }
@@ -89,18 +99,19 @@ class RecipeView extends View {
       <ul>
         ${this._data.ingredients
           .map((ingredient) => {
-            return `<li class="recipe--ingredients-item">
-        <svg class="nav-icon">
-          <use href="${icons}#icon-check"></use>
-        </svg>
-        <div>${
-          (ingredient.quantity ?? "") +
-          " " +
-          (ingredient.unit ?? "") +
-          " " +
-          ingredient.description
-        }</div>
-      </li>`;
+            return `
+            <li class="recipe--ingredients-item">
+              <svg class="nav-icon">
+                <use href="${icons}#icon-check"></use>
+              </svg>
+              <div>
+                <span>${ingredient.quantity ?? ""}</span>          
+                <span>${
+                  " " + (ingredient.unit ?? "") + " " + ingredient.description
+                }</span>
+              </div>
+            </li>
+            `;
           })
           .join("")}
       </ul>
