@@ -32,6 +32,7 @@ export const loadRecipe = async (id) => {
       servings: recipe.servings,
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
+      isBookmarked: state.bookmarks.recipeIds.includes(recipe.id),
     };
   } catch (err) {
     console.error(`${err} 😢🌋`);
@@ -71,37 +72,45 @@ export const getSearchResultsPerPage = (page = state.search.page) => {
   return state.search.results.slice(start, end);
 };
 
-export const loadBookmarks = () => {
+export const loadBookmarks = async () => {
   //Clear current loaded bookmarked recipes
-  state.bookmarks.recipeIds =
-    JSON.parse(localStorage.getItem("bookmarks")) ?? [];
-
   state.bookmarks.recipes = [];
 
+  let storedBookmarks;
+  storedBookmarks = localStorage.getItem("bookmarks");
+
+  if (!storedBookmarks) {
+    state.bookmarks.recipeIds = [];
+    return;
+  }
+
+  state.bookmarks.recipeIds = JSON.parse(storedBookmarks);
+
   const recipeIds = state.bookmarks.recipeIds;
+
   if (recipeIds.length === 0) return;
 
-  for (let i = 0; i < recipeIds.length; i++) {
-    const id = recipeIds[i];
+  try {
+    const res = Promise.all(recipeIds.map((id) => getJSON(BASE_URL + id)));
 
-    getJSON(BASE_URL + id)
-      .then((res) => {
-        const { recipe } = res.data;
-        state.bookmarks.recipes.push({
-          id: recipe.id,
-          title: recipe.title,
-          publisher: recipe.publisher,
-          image: recipe.image_url,
-        });
-      })
-      .catch((err) => {
-        console.error(`${err} 😢🌋`);
-        throw err;
-      });
+    const recipesData = await res;
+
+    state.bookmarks.recipes = recipesData.map((data) => {
+      const { recipe } = data.data;
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        publisher: recipe.publisher,
+        image: recipe.image_url,
+      };
+    });
+  } catch (err) {
+    console.error(`${err} 😢🌋`);
+    throw err;
   }
 };
 
-export const updateBookmarks = async (action) => {
+export const updateBookmarks = (action) => {
   const recipeId = state.recipe.id;
   if (action === "add") {
     state.bookmarks.recipeIds.push(recipeId);
@@ -111,7 +120,7 @@ export const updateBookmarks = async (action) => {
     );
   }
 
-  localStorage.setItem("bookmarks", JSON.stringify(state.bookmarks.recipeIds));
+  state.recipe.isBookmarked = !state.recipe.isBookmarked;
 
-  loadBookmarks();
+  localStorage.setItem("bookmarks", JSON.stringify(state.bookmarks.recipeIds));
 };

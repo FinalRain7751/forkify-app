@@ -6,14 +6,8 @@ class RecipeView extends View {
   _parentElement = document.getElementById("recipe");
   _errorMsg = "We could not find that recipe. Please try another one!";
   _message = "";
-  _recipeId = "";
-  _isBookmarked;
 
-  getRecipeId() {
-    return this._recipeId;
-  }
-
-  addHandlerRender(handler, getBookmarkStatus, updateBookmarks) {
+  addHandlerRender(handler, updateServingsHandler, updateBookmarksHandler) {
     ["hashchange", "load"].forEach((event) => {
       window.addEventListener(event, async (e) => {
         e.preventDefault();
@@ -25,32 +19,28 @@ class RecipeView extends View {
         const recipeId = window.location.hash.slice(1);
         if (!recipeId) return;
 
-        this._recipeId = recipeId;
-
-        this._isBookmarked = getBookmarkStatus();
-        await handler();
-
-        // if (event === "hashchange") {
-        // }
+        await handler(recipeId);
       });
     });
 
     this._parentElement.addEventListener("click", async (event) => {
-      event.preventDefault();
-
-      if (!event.target.closest(".recipe--info-bookmark")) return;
-
-      let action;
-
-      if (this._isBookmarked) {
-        action = "remove";
-      } else {
-        action = "add";
+      if (event.target.closest(".recipe--info-bookmark")) {
+        let action;
+        if (this._data.isBookmarked) {
+          action = "remove";
+        } else {
+          action = "add";
+        }
+        updateBookmarksHandler(action);
       }
 
-      this._isBookmarked = !this._isBookmarked;
-      await updateBookmarks(action);
-      this.render(this._data);
+      if (event.target.closest("#increase-servings")) {
+        updateServingsHandler("increase");
+      }
+
+      if (event.target.closest("#decrease-servings")) {
+        updateServingsHandler("decrease");
+      }
     });
   }
 
@@ -74,12 +64,14 @@ class RecipeView extends View {
               <use href="src/images/${icons}#icon-users"></use>
             </svg>
           </p>
-          <p>${this._data.servings} servings</p>
+          <p>${this._data.servings} serving${
+      this._data.servings === 1 ? "" : "s"
+    }</p>
           <div class="recipe--info-servings_btn">
-            <svg class="nav-icon">
+            <svg class="nav-icon" id='increase-servings'>
               <use href="${icons}#icon-plus-circle"></use>
             </svg>
-            <svg class="nav-icon">
+            <svg class="nav-icon" id='decrease-servings'>
               <use href="${icons}#icon-minus-circle"></use>
             </svg>
           </div>
@@ -88,7 +80,7 @@ class RecipeView extends View {
       <div class="recipe--info-bookmark">
         <svg class="nav-icon">
           <use href="${icons}#icon-bookmark${
-      this._isBookmarked ? "" : "-fill"
+      this._data.isBookmarked ? "" : "-fill"
     }"></use>
         </svg>
       </div>

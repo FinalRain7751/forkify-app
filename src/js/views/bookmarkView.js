@@ -2,39 +2,13 @@ import View from "./View";
 
 class BookmarkView extends View {
   _parentElement = document.querySelector(".bookmark-list");
+  _grandParentElement = document.querySelector(".nav-actions");
   _showBookmarkBtn = document.querySelector("#show-bookmarks");
 
-  addHandlerBookmarks(loadBookmarks, handler) {
-    window.addEventListener("load", (event) => {
+  addHandlerBookmarks(handler) {
+    window.addEventListener("load", async (event) => {
       event.preventDefault();
-      loadBookmarks();
-    });
-
-    const event = new Event("custom_event");
-
-    this._showBookmarkBtn.addEventListener("mouseover", showBookmarks);
-    this._parentElement.addEventListener("mouseover", (e) => {
-      e.preventDefault();
-
-      this._showBookmarkBtn.removeEventListener("custom_event", hideBookmarks);
-      handler();
-    });
-
-    this._showBookmarkBtn.addEventListener("custom_event", hideBookmarks);
-    this._parentElement.addEventListener("custom_event", hideBookmarks);
-
-    this._showBookmarkBtn.addEventListener("mouseout", (e) => {
-      e.preventDefault();
-      setTimeout(() => {
-        this._showBookmarkBtn.dispatchEvent(event);
-      }, 500);
-    });
-
-    this._parentElement.addEventListener("mouseout", (e) => {
-      e.preventDefault();
-      setTimeout(() => {
-        this._parentElement.dispatchEvent(event);
-      }, 500);
+      await handler();
     });
   }
 
