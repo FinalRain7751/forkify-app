@@ -11,12 +11,14 @@ import {
   loadRecipesList,
   state,
   updateServings,
+  uploadRecipe,
 } from "./model";
 import recipeView from "./views/recipeView";
 import searchView from "./views/searchView";
 import recipeListView from "./views/recipeListView";
 import paginationBtnView from "./views/paginationBtnView";
 import bookmarkView from "./views/bookmarkView";
+import addRecipeView from "./views/addRecipeView";
 
 if (module.hot) {
   module.hot.accept();
@@ -27,6 +29,7 @@ export const controlRecipes = async (recipeId) => {
     recipeView.renderSpinner();
     await loadRecipe(recipeId);
     recipeView.render(state.recipe);
+    bookmarkView.render(state.bookmarks.recipes);
   } catch (err) {
     console.log(`${err} 🌋🌋🌋`);
     recipeView.renderError();
@@ -42,6 +45,8 @@ export const controlSearchResults = async () => {
     await loadRecipesList(query);
 
     recipeListView.render(getSearchResultsPerPage());
+    recipeListView.showCurrRecipeSelection();
+
     paginationBtnView.render({
       lastPage: state.search.lastPage,
       currentPage: state.search.page,
@@ -92,13 +97,8 @@ export const controlUpdateBookmarks = (action) => {
   }
 
   updateBookmarks(newBookmarksIds, newBookmarks);
+
   recipeView.update(state.recipe);
-
-  // if (newBookmarks.length === 0) {
-  //   bookmarkView._clear;
-  // }
-
-  // bookmarkView.render(state.bookmarks.recipes);
   bookmarkView.render(state.bookmarks.recipes);
 };
 
@@ -119,8 +119,34 @@ export const controlServings = (action) => {
   recipeView.update(state.recipe);
 };
 
+export const controlAddRecipe = async (formData) => {
+  try {
+    await uploadRecipe(formData);
+
+    addRecipeView.renderSpinner();
+
+    addRecipeView.renderMessage();
+
+    setTimeout(() => {
+      addRecipeView.hideModal();
+    }, 2000);
+
+    recipeView.render(state.recipe);
+    bookmarkView.render(state.bookmarks.recipes);
+
+    window.history.pushState(null, "", `#${state.recipe.id}`);
+
+    console.log(state.recipe);
+  } catch (err) {
+    console.log(err, "🌋🌋");
+    addRecipeView.renderError(err);
+  }
+};
+
 const init = () => {
   searchView.searchBarAnimation();
+  addRecipeView.handleModal();
+  addRecipeView.addHandlerUpload(controlAddRecipe);
   bookmarkView.addHandlerBookmarks(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes);
   recipeView.addHandlerUpdateServings(controlServings);

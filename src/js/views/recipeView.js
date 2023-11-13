@@ -87,12 +87,23 @@ class RecipeView extends View {
           </div>
         </div>
       </div>
-      <div class="recipe--info-bookmark">
-        <svg class="nav-icon">
-          <use href="${icons}#icon-bookmark${
-      this._data.isBookmarked ? "" : "-fill"
+      <div class="flex-center" style="gap: 1rem">
+        ${
+          this._data.key
+            ? `<div class="recipe--info-bookmark">    
+          <svg class="nav-icon">
+            <use href="${icons}#icon-user"></use>
+          </svg>
+        </div>`
+            : ""
+        }
+        <div class="recipe--info-bookmark">
+          <svg class="nav-icon">
+            <use href="${icons}#icon-bookmark${
+      this._data.isBookmarked ? "-fill" : ""
     }"></use>
-        </svg>
+          </svg>
+        </div>
       </div>
     </section>
     <section class="recipe--ingredients flex-center">

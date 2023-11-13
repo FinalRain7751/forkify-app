@@ -1,26 +1,27 @@
 import icons from "url:../../images/icons.svg";
 import View from "./View";
+import recipeItemView from "./recipeItemView";
 
 class RecipeListView extends View {
   _parentElement = document.querySelector("#recipeList");
   _errorMsg = "No matching recipe found. Please try searching something else!";
   _message = "";
 
+  showCurrRecipeSelection() {
+    document.addEventListener("click", (e) => {
+      const target = e.target.closest(".recipe-list--item");
+      if (!target) return;
+      const currSelectedRecipe = this._parentElement.querySelector(".selected");
+      if (currSelectedRecipe) {
+        currSelectedRecipe.classList.remove("selected");
+      }
+      target.classList.add("selected");
+    });
+  }
+
   _generateMarkup() {
     return `${this._data
-      .map((recipe) => {
-        return `
-        <li class="recipe-list--item" id="${recipe.id}">
-            <a href="#${recipe.id}">
-                <img src="${recipe.image}" alt="small recipe image" />
-                <div>
-                    <h4>${recipe.title}</h4>
-                    <p>${recipe.publisher}</p>
-                </div>
-            </a>
-        </li>
-        `;
-      })
+      .map((recipe) => recipeItemView.render(recipe, false))
       .join("")};
     `;
   }

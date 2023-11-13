@@ -84,6 +84,104 @@ body {
   overflow: hidden;
 }
 
+.overlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  height: 100vh;
+  background-color: var(--color-grey-dark-2);
+  backdrop-filter: blur(4px);
+  opacity: 0.4;
+
+  visibility: visible;
+  transition: all 500ms;
+}
+
+.modal {
+  position: fixed;
+  top: 5rem;
+  left: 50%;
+  width: var(--bp-medium);
+  z-index: 1000;
+  background-color: var(--color-grey-light-1);
+  transform: translateX(-50%);
+  border-radius: 10px;
+
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+
+  visibility: visible;
+  opacity: 1;
+  transition: all 500ms;
+}
+
+.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.btn--close-modal {
+  align-self: flex-end;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 10px;
+  outline: none;
+  border: 1px solid grey;
+}
+
+.btn--close-modal:hover,
+.btn--close-modal:focus {
+  border: 1px solid black;
+}
+
+.add-new-recipe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+}
+
+.upload__column {
+  display: grid;
+  grid-template-columns: 1fr 2.8fr;
+  column-gap: 1rem;
+  row-gap: 1rem;
+}
+
+.upload__column label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.upload__column input {
+  font-size: 1.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+.upload__column input::placeholder {
+  color: var(--color-grey-light-3);
+}
+
+.upload__column input:focus {
+  outline: none;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-grey-light-1);
+}
+
+.upload__heading {
+  font-size: 2.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  grid-column: 1/-1;
+}
+
 .flex-center {
   display: flex;
   justify-content: center;
@@ -230,20 +328,20 @@ body {
 }
 
 .bookmark-list {
+  background-color: white;
   display: none;
   flex-direction: column;
   position: absolute;
   top: 100%;
   z-index: 10;
+
+  max-height: 20rem;
+  overflow-y: scroll;
 }
 
 .show-bookmarks:hover .bookmark-list {
   display: flex;
   transition: display 500ms;
-}
-
-.bookmark-list--item {
-  background-color: var(--color-grey-light-1);
 }
 
 .main {
@@ -257,9 +355,17 @@ body {
 
 .no-recipe-selected,
 .no-recipe-error {
-  padding: 6rem 10rem;
+  /* padding: 6rem 10rem; */
+  padding: 2rem;
+  /* width: 100%; */
+  /* margin: 2rem auto; */
   gap: 1rem;
   text-align: center;
+}
+
+.no-recipe-error > svg {
+  height: 6rem;
+  width: 6rem;
 }
 
 .no-recipe-selected .nav-icon {
@@ -418,10 +524,27 @@ aside {
   /* row-gap: 1rem; */
 }
 
-.recipe-list--item > a,
-.bookmark-list--item > a {
+.recipe-list--item {
+  position: relative;
+  background-color: var(--color-grey-light-1);
+}
+
+.user-icon {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--color-grad-2);
+}
+
+.recipe-list--item.selected {
+  background-color: var(--color-grey-light-3);
+}
+
+.recipe-list--item > a {
   padding: 1rem 2rem;
-  height: 6rem;
+  height: auto;
   display: flex;
   justify-content: left;
   align-items: center;
@@ -430,16 +553,14 @@ aside {
   transition: transform ease-in-out 500ms;
 }
 
-.recipe-list--item > a:hover,
-.bookmark-list--item > a:hover {
-  background-color: var(--color-grey-light-2);
+.recipe-list--item > a:hover {
+  background-color: var(--color-grey-light-3);
   transform: translateY(-5px);
 
   cursor: pointer;
 }
 
-.recipe-list--item > a > img,
-.bookmark-list--item > a > img {
+.recipe-list--item > a > img {
   height: 4rem;
   width: 4rem;
   background-color: #615551;
@@ -447,8 +568,7 @@ aside {
   overflow: hidden;
 }
 
-.recipe-list--item > a h4,
-.bookmark-list--item > a h4 {
+.recipe-list--item > a h4 {
   font-size: var(--fs-500);
   font-weight: var(--fw-600);
   text-transform: uppercase;
@@ -456,8 +576,7 @@ aside {
   width: 25ch;
 }
 
-.recipe-list--item > a p,
-.bookmark-list--item > a p {
+.recipe-list--item > a p {
   font-size: var(--fs-400);
   font-weight: var(--fw-400);
   text-transform: uppercase;
